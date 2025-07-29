@@ -59,6 +59,9 @@ jobs:
 
           ${{ steps.create_release.outputs.url }}"
           pr_branch="release-pre-${{ env.COMMIT_COUNT }}"
-          gh pr create --title "$pr_title" --body "$pr_body" --draft --head "$pr_branch"
+          if ! gh pr create --title "$pr_title" --body "$pr_body" --draft --head "$pr_branch"; then
+            echo "Failed to create PR. Please check if the branch already exists or if there are any conflicts."
+            exit 1
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
