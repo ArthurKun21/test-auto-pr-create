@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Create PR
+      - name: Git commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -52,10 +52,13 @@ jobs:
           git commit -m "Prepare release pre-${{ env.COMMIT_COUNT }}"
           git push -u origin release-pre-${{ env.COMMIT_COUNT }}
 
+      - name: Create PR
+        run: |
           pr_title="Release pre-${{ env.COMMIT_COUNT }}"
           pr_body="This PR creates a draft release for version pre-${{ env.COMMIT_COUNT }}.
 
           ${{ steps.create_release.outputs.url }}"
-          gh pr create --title "$pr_title" --body "$pr_body" --draft
+          pr_branch="release-pre-${{ env.COMMIT_COUNT }}"
+          gh pr create --title "$pr_title" --body "$pr_body" --draft --head "$pr_branch"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
