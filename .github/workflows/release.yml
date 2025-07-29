@@ -45,7 +45,18 @@ jobs:
       - name: Git commit and push changes
         run: |
           git switch -c release-pre-${{ env.COMMIT_COUNT }}
-          git add CHANGELOG.md
+
+          # Check if docs/changelog directory exists, create if not
+          mkdir -p docs/changelog
+
+          if ! touch docs/changelog/pre-${{ env.COMMIT_COUNT }}.md; then
+            echo "Failed to create changelog file. Please check directory permissions or existence."
+            exit 1
+          fi
+
+          echo -e "## Version pre-${{ env.COMMIT_COUNT }}" > docs/changelog/pre-${{ env.COMMIT_COUNT }}.md
+
+          git add CHANGELOG.md docs/changelog/pre-${{ env.COMMIT_COUNT }}.md
           git commit -m "Prepare release pre-${{ env.COMMIT_COUNT }}"
           git push -u origin release-pre-${{ env.COMMIT_COUNT }}
 
