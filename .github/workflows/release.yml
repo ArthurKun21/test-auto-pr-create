@@ -54,5 +54,3 @@ jobs:
           pr_title="Release pre-${{ env.COMMIT_COUNT }}"
           pr_body="This PR creates a draft release for version pre-${{ env.COMMIT_COUNT }}."
           gh pr create --title "$pr_title" --body "$pr_body" --draft
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
