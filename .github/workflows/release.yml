@@ -1,0 +1,58 @@
+name: Release Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup tag
+        run: |
+          commit_count=$(git rev-list --count HEAD)
+          echo "COMMIT_COUNT=$commit_count" >> $GITHUB_ENV
+      
+      - name: Setup dummy release
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            touch CHANGELOG.md
+          fi
+      
+      - name: Prepare changelog
+        run: |
+          echo -e "## Version pre-${{ env.COMMIT_COUNT }}\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
+        with:
+          tag_name: pre-${{ env.COMMIT_COUNT }}
+          name: Release ${{ env.COMMIT_COUNT }}
+          files: |
+            CHANGELOG.md
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create PR
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git switch -c release-pre-${{ env.COMMIT_COUNT }}
+          git add CHANGELOG.md
+          git commit -m "Prepare release pre-${{ env.COMMIT_COUNT }}"
+          git push -u origin release-pre-${{ env.COMMIT_COUNT }}
+
+          pr_title="Release pre-${{ env.COMMIT_COUNT }}"
+          pr_body="This PR creates a draft release for version pre-${{ env.COMMIT_COUNT }}."
+          gh pr create --title "$pr_title" --body "$pr_body" --draft
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
