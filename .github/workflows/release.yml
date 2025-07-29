@@ -53,7 +53,7 @@ jobs:
           git push -u origin release-pre-${{ env.COMMIT_COUNT }}
 
           pr_title="Release pre-${{ env.COMMIT_COUNT }}"
-          pr_body="This PR creates a draft release for version pre-${{ env.COMMIT_COUNT }}."
+          pr_body="This PR creates a draft release for version pre-${{ env.COMMIT_COUNT }}.\n\n${{ steps.create_release.outputs.url }}"
           gh pr create --title "$pr_title" --body "$pr_body" --draft
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
