@@ -44,6 +44,9 @@ jobs:
       
       - name: Git commit and push changes
         run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com' 
+          
           git switch -c release-pre-${{ env.COMMIT_COUNT }}
 
           # Check if docs/changelog directory exists, create if not
