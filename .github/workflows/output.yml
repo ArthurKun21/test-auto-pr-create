@@ -18,3 +18,5 @@ jobs:
           else
             echo "Failed to get repository information"
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
