@@ -1,0 +1,20 @@
+name: Get output Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fetch-release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Fetch Latest Release
+        run: |
+          if OUTPUT=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName --limit 1 --jq '.[0].tagName'); then
+            export FULL_REPO_NAME="$OUTPUT"
+            echo "Repository: $FULL_REPO_NAME"
+          else
+            echo "Failed to get repository information"
+          fi
