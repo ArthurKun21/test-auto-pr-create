@@ -10,6 +10,8 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Fetch Latest Release
         run: |
           if OUTPUT=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName --limit 1 --jq '.[0].tagName'); then
