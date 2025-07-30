@@ -11,6 +11,7 @@ jobs:
       pull-requests: write
     env:
       TAG_NAME: ''
+      OTHER_TAG_NAME: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,4 +31,29 @@ jobs:
       - name: Output Release Tag
         run: |
           echo "Latest Release Tag: ${{ env.TAG_NAME }}"
+
+      - name: Checkout code 2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          repository: 'ArthurKun21/fga-preview-build'
+          path: 'build'
+      
+      - name: Fetch Latest Release From Build
+        id: last_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd build
+
+          if OUTPUT=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName --limit 1 --jq '.[0].tagName'); then
+            echo "OTHER_TAG_NAME=$OUTPUT" >> $GITHUB_ENV
+          else
+            echo "Failed to get repository information"
+            exit 1
+          fi
+      
+      - name: Output Release Tag from build
+        run: |
+          echo "Latest Release Tag from build: ${{ env.OTHER_TAG_NAME }}"
 
