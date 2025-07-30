@@ -9,16 +9,25 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      TAG_NAME: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Fetch Latest Release
-        run: |
-          if OUTPUT=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName --limit 1 --jq '.[0].tagName'); then
-            export FULL_REPO_NAME="$OUTPUT"
-            echo "Repository: $FULL_REPO_NAME"
-          else
-            echo "Failed to get repository information"
-          fi
+        id: last_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if OUTPUT=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName --limit 1 --jq '.[0].tagName'); then
+            echo "TAG_NAME=$OUTPUT" >> $GITHUB_ENV
+          else
+            echo "Failed to get repository information"
+            exit 1
+          fi
+      
+      - name: Output Release Tag
+        run: |
+          echo "Latest Release Tag: ${{ env.TAG_NAME }}"
+
